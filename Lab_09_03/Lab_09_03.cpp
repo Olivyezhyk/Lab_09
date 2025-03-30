@@ -17,7 +17,7 @@ void inputNotes(Note notes[], int& N);
 void displayNotes(const Note notes[], int N);
 void sortNotesByBirthday(Note notes[], int N);
 Note* searchByPhone(Note notes[], int N, const string& phone);
-void saveToFile(const Note notes[], int N, const string& filename);
+void saveToFile(Note notes[], int N, const string& filename);
 void loadFromFile(Note notes[], int& N, const string& filename);
 
 int main() {
@@ -84,6 +84,8 @@ int main() {
             cout << "Enter filename: ";
             getline(cin, filename);
             loadFromFile(notes, N, filename);
+            cout << "Loaded data:" << endl;
+            displayNotes(notes, N);
             cout << endl;
             break;
         case 0:
@@ -138,68 +140,40 @@ Note* searchByPhone(Note notes[], int N, const string& phone) {
     return nullptr;
 }
 
-void saveToFile(const Note notes[], int N, const string& filename) {
-    ofstream fout(filename, ios::binary);
+void saveToFile(Note notes[], int N, const string& filename) {
+    ofstream fout(filename);
     if (!fout) {
-        cout << "Error opening file for writing!" << endl;
+        cerr << "Error opening file for writing!" << endl;
         return;
     }
 
-    fout.write(reinterpret_cast<const char*>(&N), sizeof(N));
+    fout << N << '\n';
     for (int i = 0; i < N; i++) {
-        size_t len = notes[i].surname.size();
-        fout.write(reinterpret_cast<const char*>(&len), sizeof(len));
-        fout.write(notes[i].surname.c_str(), len);
-
-        len = notes[i].name.size();
-        fout.write(reinterpret_cast<const char*>(&len), sizeof(len));
-        fout.write(notes[i].name.c_str(), len);
-
-        len = notes[i].phone.size();
-        fout.write(reinterpret_cast<const char*>(&len), sizeof(len));
-        fout.write(notes[i].phone.c_str(), len);
-
-        fout.write(reinterpret_cast<const char*>(notes[i].birthDate), sizeof(notes[i].birthDate));
+        fout << notes[i].surname << '\n' << notes[i].name << '\n' << notes[i].phone << '\n';
+        fout << notes[i].birthDate[0] << ' ' << notes[i].birthDate[1] << ' ' << notes[i].birthDate[2] << '\n';
     }
-
-    fout.close();
 }
 
 void loadFromFile(Note notes[], int& N, const string& filename) {
-    ifstream fin(filename, ios::binary);
+    ifstream fin(filename);
     if (!fin) {
-        cout << "Failed to open the file!" << endl;
+        cerr << "Failed to open the file!" << endl;
         return;
     }
 
-    fin.read(reinterpret_cast<char*>(&N), sizeof(N));
+    fin >> N;
+    fin.ignore();
     if (N > MAX_NOTES) {
-        cout << "Error: File contains more records than allowed!" << endl;
+        cerr << "Error: Too many records in file!" << endl;
         N = 0;
         return;
     }
 
     for (int i = 0; i < N; i++) {
-        size_t len;
-
-        fin.read(reinterpret_cast<char*>(&len), sizeof(len));
-        notes[i].surname.resize(len);
-        fin.read(&notes[i].surname[0], len);
-
-        fin.read(reinterpret_cast<char*>(&len), sizeof(len));
-        notes[i].name.resize(len);
-        fin.read(&notes[i].name[0], len);
-
-        fin.read(reinterpret_cast<char*>(&len), sizeof(len));
-        notes[i].phone.resize(len);
-        fin.read(&notes[i].phone[0], len);
-
-        fin.read(reinterpret_cast<char*>(notes[i].birthDate), sizeof(notes[i].birthDate));
+        getline(fin, notes[i].surname);
+        getline(fin, notes[i].name);
+        getline(fin, notes[i].phone);
+        fin >> notes[i].birthDate[0] >> notes[i].birthDate[1] >> notes[i].birthDate[2];
+        fin.ignore();
     }
-
-    fin.close();
-
-    cout << "Loaded " << N << " records." << endl;
-    cout << endl;
-    displayNotes(notes, N);
 }

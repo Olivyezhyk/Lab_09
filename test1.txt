@@ -1,0 +1,26 @@
+Enter the number of students: 3
+
+Student #1:
+Surname: Ivanenko
+Course: 2
+Specialty (0 - Computer Science, 1 - Informatics, 2 - Math and Economics, 3 - Physics and Informatics, 4 - Technical Education): 0
+Physics grade: 5
+Math grade: 4
+Informatics grade/Programming grade: 5
+
+Student #2:
+Surname: Petrenko
+Course: 3
+Specialty (0 - Computer Science, 1 - Informatics, 2 - Math and Economics, 3 - Physics and Informatics, 4 - Technical Education): 1
+Physics grade: 4
+Math grade: 3
+Informatics grade/Numerical methods grade: 4
+
+Student #3:
+Surname: Shevchenko
+Course: 1
+Specialty (0 - Computer Science, 1 - Informatics, 2 - Math and Economics, 3 - Physics and Informatics, 4 - Technical Education): 2
+Physics grade: 3
+Math grade: 5
+Informatics grade/Pedagogy grade: 3
+

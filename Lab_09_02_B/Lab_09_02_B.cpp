@@ -21,33 +21,25 @@ struct Student_B {
 
 void Create_B(Student_B* p, const int N);
 void Print_B(Student_B* p, const int N);
-void Sort_B(Student_B* p, const int N, int criterion);
+void SortStudents_B(Student_B* p, const int N, int sortOption);
 int* IndexSort_B(Student_B* p, const int N);
 void PrintIndexSorted_B(Student_B* p, int* I, const int N);
-bool CompareStudents_B(const Student_B& a, const Student_B& b);
-bool BinarySearch_B(Student_B* p, const int N, const string& surname, int course, int physics_grade);
-
-int ChooseSortCriteria() {
-    int choice;
-    cout << "Select sorting criteria:" << endl;
-    cout << "1. Sort by Physics grade" << endl;
-    cout << "2. Sort by Course" << endl;
-    cout << "3. Sort by Surname (descending)" << endl;
-    cout << "Enter your choice (1/2/3): ";
-    cin >> choice;
-    return choice;
-}
+bool BinarySearch_B(Student_B* p, const int N, const std::string& surname, int course, int physics_grade, int sortOption);
 
 int main() {
-
     int N;
     cout << "Enter the number of students: ";
     cin >> N;
 
+    cout << endl;
     Student_B* students_B = new Student_B[N];
     Create_B(students_B, N);
-    int sortCriterion = ChooseSortCriteria();
-    Sort_B(students_B, N, sortCriterion);
+
+    int sortOption;
+    cout << "Choose sorting option (1 - by physics grade, 2 - by course, 3 - by surname): ";
+    cin >> sortOption;
+    SortStudents_B(students_B, N, sortOption);
+
     cout << endl;
     Print_B(students_B, N);
 
@@ -60,7 +52,6 @@ int main() {
 
     string searchSurnameB;
     int searchCourseB, searchPhysicsGradeB;
-
     cout << "Enter surname to search: ";
     cin >> searchSurnameB;
     cout << "Enter course: ";
@@ -68,7 +59,7 @@ int main() {
     cout << "Enter physics grade: ";
     cin >> searchPhysicsGradeB;
 
-    bool foundB = BinarySearch_B(students_B, N, searchSurnameB, searchCourseB, searchPhysicsGradeB);
+    bool foundB = BinarySearch_B(students_B, N, searchSurnameB, searchCourseB, searchPhysicsGradeB, sortOption);
     if (foundB) {
         cout << "Student found in Student!" << endl;
     }
@@ -78,9 +69,9 @@ int main() {
     cout << endl;
 
     delete[] students_B;
-
     return 0;
 }
+
 
 void Create_B(Student_B* p, const int N) {
     int specialty;
@@ -157,31 +148,53 @@ void Print_B(Student_B* p, const int N) {
     cout << endl;
 }
 
-void Sort_B(Student_B* p, const int N, int criterion) {
-    Student_B tmp;
+void SortStudents_B(Student_B* p, const int N, int sortOption) {
     for (int i = 0; i < N - 1; i++) {
         for (int j = 0; j < N - i - 1; j++) {
-            bool swap = false;
-            if (criterion == 1) {
-                if ((p[j].physics_grade < p[j + 1].physics_grade)) {
-                    swap = true;
+            bool swapCondition = false;
+
+            if (sortOption == 1) {
+                if (p[j].physics_grade < p[j + 1].physics_grade) {
+                    swapCondition = true;
+                }
+                else if (p[j].physics_grade == p[j + 1].physics_grade) {
+                    if (p[j].course > p[j + 1].course) {
+                        swapCondition = true;
+                    }
+                    else if (p[j].course == p[j + 1].course && p[j].surname < p[j + 1].surname) {
+                        swapCondition = true;
+                    }
                 }
             }
-            else if (criterion == 2) {
+            else if (sortOption == 2) {
                 if (p[j].course > p[j + 1].course) {
-                    swap = true;
+                    swapCondition = true;
+                }
+                else if (p[j].course == p[j + 1].course) {
+                    if (p[j].physics_grade < p[j + 1].physics_grade) {
+                        swapCondition = true;
+                    }
+                    else if (p[j].physics_grade == p[j + 1].physics_grade && p[j].surname < p[j + 1].surname) {
+                        swapCondition = true;
+                    }
                 }
             }
-            else if (criterion == 3) {
+            else if (sortOption == 3) {
                 if (p[j].surname < p[j + 1].surname) {
-                    swap = true;
+                    swapCondition = true;
+                }
+                else if (p[j].surname == p[j + 1].surname) {
+                    if (p[j].course > p[j + 1].course) {
+                        swapCondition = true;
+                    }
+                    else if (p[j].course == p[j + 1].course && p[j].physics_grade < p[j + 1].physics_grade) {
+                        swapCondition = true;
+                    }
                 }
             }
 
-            if (swap) {
-                tmp = p[j];
-                p[j] = p[j + 1];
-                p[j + 1] = tmp;
+            if (swapCondition) {
+                swap(p[j], p[j + 1]);
             }
         }
     }
@@ -247,29 +260,74 @@ void PrintIndexSorted_B(Student_B* p, int* I, const int N) {
     cout << endl;
 }
 
-bool CompareStudents_B(const Student_B& a, const Student_B& b) {
-    if (a.surname != b.surname) return a.surname < b.surname;
-    if (a.course != b.course) return a.course < b.course;
-    return a.physics_grade < b.physics_grade;
-}
 
-
-bool BinarySearch_B(Student_B* p, const int N, const string& surname, int course, int physics_grade) {
+bool BinarySearch_B(Student_B* p, const int N, const std::string& surname, int course, int physics_grade, int sortOption) {
     int left = 0, right = N - 1;
 
     while (left <= right) {
         int mid = left + (right - left) / 2;
 
-        if (p[mid].surname == surname && p[mid].course == course && p[mid].physics_grade == physics_grade) {
-            return true;
+        bool match = false;
+
+        if (sortOption == 1) {
+            if (p[mid].physics_grade == physics_grade) {
+                if (p[mid].course == course && p[mid].surname == surname) {
+                    match = true;
+                }
+                else if (p[mid].course > course) {
+                    right = mid - 1;
+                }
+                else {
+                    left = mid + 1;
+                }
+            }
+            else if (p[mid].physics_grade > physics_grade) {
+                left = mid + 1;
+            }
+            else {
+                right = mid - 1;
+            }
+        }
+        else if (sortOption == 2) {
+            if (p[mid].course == course) {
+                if (p[mid].physics_grade == physics_grade && p[mid].surname == surname) {
+                    match = true;
+                }
+                else if (p[mid].physics_grade > physics_grade) {
+                    right = mid - 1;
+                }
+                else {
+                    left = mid + 1;
+                }
+            }
+            else if (p[mid].course < course) {
+                left = mid + 1;
+            }
+            else {
+                right = mid - 1;
+            }
+        }
+        else if (sortOption == 3) {
+            if (p[mid].surname == surname) {
+                if (p[mid].course == course && p[mid].physics_grade == physics_grade) {
+                    match = true;
+                }
+                else if (p[mid].course < course) {
+                    left = mid + 1;
+                }
+                else {
+                    right = mid - 1;
+                }
+            }
+            else if (p[mid].surname > surname) {
+                left = mid + 1;
+            }
+            else {
+                right = mid - 1;
+            }
         }
 
-        if (CompareStudents_B(p[mid], Student_B{ surname, course, {}, physics_grade, 0, 0 })) {
-            right = mid - 1;
-        }
-        else {
-            left = mid + 1;
-        }
+        if (match) return true;
     }
 
     return false;

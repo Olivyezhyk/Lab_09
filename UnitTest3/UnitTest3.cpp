@@ -20,7 +20,7 @@ namespace UnitTest3
 			};
 			int N = 4;
 
-			Sort_A(students, N, 1);
+			SortStudents_A(students, N, 1);
 
 			Assert::AreEqual(students[0].physics_grade, 5);
 			Assert::AreEqual(students[1].physics_grade, 5);
@@ -38,7 +38,7 @@ namespace UnitTest3
 			};
 			int N = 4;
 
-			Sort_A(students, N, 2);
+			SortStudents_A(students, N, 2);
 
 			Assert::AreEqual(students[0].course, 1);
 			Assert::AreEqual(students[1].course, 2);
