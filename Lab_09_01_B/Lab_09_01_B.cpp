@@ -19,32 +19,73 @@ struct Student_B {
     };
 };
 
-void Create_B(Student_B* p, const int N);
+void Create_B(Student_B*& p, int& N);
 void Print_B(Student_B* p, const int N);
-void CountPhysicsGrades_B(Student_B* p, const int N);
-void CountPhysicsAndMathGrades_B(Student_B* p, const int N);
+void CountPhysicsGrades_B(Student_B* p, const int N, int& count_5, int& count_4, int& count_3);
+int CountPhysicsAndMathGrades_B(Student_B* p, const int N);
 
 int main() {
-    int N;
-    cout << "Enter the number of students: ";
-    cin >> N;
+    int N = 0;
+    Student_B* students_B = nullptr;
 
-    Student_B* students_B = new Student_B[N];
-    Create_B(students_B, N);
-    Print_B(students_B, N);
+    int choice;
+    do {
+        cout << "\nMENU:" << endl;
+        cout << "1. Create student list" << endl;
+        cout << "2. Print students" << endl;
+        cout << "3. Count Physics grades" << endl;
+        cout << "4. Count students with high Physics and Math grades" << endl;
+        cout << "5. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
 
-    CountPhysicsGrades_B(students_B, N);
-    CountPhysicsAndMathGrades_B(students_B, N);
+        switch (choice) {
+        case 1:
+            if (students_B) delete[] students_B;
+            Create_B(students_B, N);
+            break;
+        case 2:
+            if (students_B) Print_B(students_B, N);
+            else cout << "No students available. Please create a list first." << endl;
+            break;
+        case 3:
+            if (students_B) {
+                int count_5, count_4, count_3;
+                CountPhysicsGrades_B(students_B, N, count_5, count_4, count_3);
+                cout << "Physics grade distribution: 5 - " << count_5 << ", 4 - " << count_4 << ", 3 - " << count_3 << endl;
+            }
+            else {
+                cout << "No students available. Please create a list first." << endl;
+            }
+            break;
+        case 4:
+            if (students_B) {
+                int count = CountPhysicsAndMathGrades_B(students_B, N);
+                cout << "Number of students with grades 4 or 5 in both Physics and Math: " << count << endl;
+            }
+            else {
+                cout << "No students available. Please create a list first." << endl;
+            }
+            break;
+        case 5:
+            cout << "Exiting program..." << endl;
+            break;
+        default:
+            cout << "Invalid choice. Please try again." << endl;
+        }
+    } while (choice != 5);
 
     delete[] students_B;
     return 0;
 }
 
-void Create_B(Student_B* p, const int N) {
+void Create_B(Student_B*& p, int& N) {
+    cout << "Enter the number of students: ";
+    cin >> N;
+    p = new Student_B[N];
     int specialty;
     for (int i = 0; i < N; i++) {
-        cout << endl;
-        cout << "Student #" << i + 1 << ":" << endl;
+        cout << "\nStudent #" << i + 1 << ":" << endl;
         cin.ignore();
         cout << "Surname: ";
         getline(cin, p[i].surname);
@@ -67,9 +108,7 @@ void Create_B(Student_B* p, const int N) {
             cout << "Numerical methods grade: ";
             cin >> p[i].numerical_methods_grade;
             break;
-        case MATH_ECONOMICS:
-        case PHYSICS_INFORMATICS:
-        case TECHNICAL_EDUCATION:
+        default:
             cout << "Pedagogy grade: ";
             cin >> p[i].pedagogy_grade;
             break;
@@ -78,8 +117,7 @@ void Create_B(Student_B* p, const int N) {
 }
 
 void Print_B(Student_B* p, const int N) {
-    cout << endl;
-    cout << "===========================================================================================================================" << endl;
+    cout << "\n===========================================================================================================================" << endl;
     cout << "| #   | Surname         | Course | Specialty                | Physics | Math | Programming | Numerical Methods | Pedagogy |" << endl;
     cout << "---------------------------------------------------------------------------------------------------------------------------" << endl;
     for (int i = 0; i < N; i++) {
@@ -108,29 +146,26 @@ void Print_B(Student_B* p, const int N) {
             break;
         }
 
-
         cout << endl;
     }
     cout << "===========================================================================================================================" << endl;
-    cout << endl;
 }
 
-void CountPhysicsGrades_B(Student_B* p, const int N) {
-    int count_5 = 0, count_4 = 0, count_3 = 0;
+void CountPhysicsGrades_B(Student_B* p, const int N, int& count_5, int& count_4, int& count_3) {
+    count_5 = count_4 = count_3 = 0;
     for (int i = 0; i < N; i++) {
         if (p[i].physics_grade == 5) count_5++;
         else if (p[i].physics_grade == 4) count_4++;
         else if (p[i].physics_grade == 3) count_3++;
     }
-    cout << "Physics grade distribution: 5 - " << count_5 << ", 4 - " << count_4 << ", 3 - " << count_3 << endl;
 }
 
-void CountPhysicsAndMathGrades_B(Student_B* p, const int N) {
+int CountPhysicsAndMathGrades_B(Student_B* p, const int N) {
     int count = 0;
     for (int i = 0; i < N; i++) {
         if ((p[i].physics_grade >= 4) && (p[i].math_grade >= 4)) {
             count++;
         }
     }
-    cout << "Number of students with grades 4 or 5 in both Physics and Math: " << count << endl;
+    return count;
 }

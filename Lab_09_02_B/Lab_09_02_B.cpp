@@ -19,65 +19,82 @@ struct Student_B {
     };
 };
 
-void Create_B(Student_B* p, const int N);
+void Create_B(Student_B*& p, int& N);
 void Print_B(Student_B* p, const int N);
-void SortStudents_B(Student_B* p, const int N, int sortOption);
+void SortStudents_B(Student_B* p, const int N);
 int* IndexSort_B(Student_B* p, const int N);
 void PrintIndexSorted_B(Student_B* p, int* I, const int N);
-bool BinarySearch_B(Student_B* p, const int N, const std::string& surname, int course, int physics_grade, int sortOption);
+bool BinarySearch_B(Student_B* p, const int N, const std::string& surname, int course, int physics_grade);
 
 int main() {
-    int N;
-    cout << "Enter the number of students: ";
-    cin >> N;
+    Student_B* students_B = nullptr;
+    int N = 0;
+    int choice;
+    do {
+        cout << "\nMENU:" << endl;
+        cout << "1. Create student list" << endl;
+        cout << "2. Print students" << endl;
+        cout << "3. Sort students physically" << endl;
+        cout << "4. Sort students by index" << endl;
+        cout << "5. Binary search student" << endl;
+        cout << "6. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
 
-    cout << endl;
-    Student_B* students_B = new Student_B[N];
-    Create_B(students_B, N);
+        switch (choice) {
+        case 1:
+            Create_B(students_B, N);
+            break;
+        case 2:
+            if (N > 0) Print_B(students_B, N);
+            else cout << "No students available!\n";
+            break;
+        case 3:
+            SortStudents_B(students_B, N);
+            Print_B(students_B, N);
+            break;
 
-    int sortOption;
-    cout << "Choose sorting option (1 - by physics grade, 2 - by course, 3 - by surname): ";
-    cin >> sortOption;
-    SortStudents_B(students_B, N, sortOption);
+        case 4: {
+            int* I_B = IndexSort_B(students_B, N);
+            PrintIndexSorted_B(students_B, I_B, N);
+            delete[] I_B;
+            break;
+        }
+        case 5: {
+            string searchSurname;
+            int searchCourse, searchPhysicsGrade;
+            cout << "\nEnter surname: ";
+            cin >> searchSurname;
+            cout << "Enter course: ";
+            cin >> searchCourse;
+            cout << "Enter physics grade: ";
+            cin >> searchPhysicsGrade;
 
-    cout << endl;
-    Print_B(students_B, N);
-
-    cout << endl;
-    cout << "Index Sorting: " << endl;
-    int* I_B = IndexSort_B(students_B, N);
-    PrintIndexSorted_B(students_B, I_B, N);
-    delete[] I_B;
-    cout << endl;
-
-    string searchSurnameB;
-    int searchCourseB, searchPhysicsGradeB;
-    cout << "Enter surname to search: ";
-    cin >> searchSurnameB;
-    cout << "Enter course: ";
-    cin >> searchCourseB;
-    cout << "Enter physics grade: ";
-    cin >> searchPhysicsGradeB;
-
-    bool foundB = BinarySearch_B(students_B, N, searchSurnameB, searchCourseB, searchPhysicsGradeB, sortOption);
-    if (foundB) {
-        cout << "Student found in Student!" << endl;
-    }
-    else {
-        cout << "Student not found in Student!" << endl;
-    }
-    cout << endl;
+            bool found = BinarySearch_B(students_B, N, searchSurname, searchCourse, searchPhysicsGrade);
+            cout << (found ? "Student found!\n" : "Student not found!\n");
+            break;
+        }
+        case 6:
+            cout << "Exiting...\n";
+            break;
+        default:
+            cout << "Invalid choice!\n";
+        }
+    } while (choice != 6);
 
     delete[] students_B;
     return 0;
 }
 
 
-void Create_B(Student_B* p, const int N) {
+void Create_B(Student_B*& p, int& N) {
+    cout << "Enter the number of students: ";
+    cin >> N;
+    p = new Student_B[N];
+
     int specialty;
     for (int i = 0; i < N; i++) {
-        cout << endl;
-        cout << "Student #" << i + 1 << ":" << endl;
+        cout << endl << "Student #" << i + 1 << ":" << endl;
         cin.ignore();
         cout << "Surname: ";
         getline(cin, p[i].surname);
@@ -100,16 +117,14 @@ void Create_B(Student_B* p, const int N) {
             cout << "Numerical methods grade: ";
             cin >> p[i].numerical_methods_grade;
             break;
-        case MATH_ECONOMICS:
-        case PHYSICS_INFORMATICS:
-        case TECHNICAL_EDUCATION:
+        default:
             cout << "Pedagogy grade: ";
             cin >> p[i].pedagogy_grade;
             break;
         }
-        cout << endl;
     }
 }
+
 
 void Print_B(Student_B* p, const int N) {
     cout << endl;
@@ -148,52 +163,48 @@ void Print_B(Student_B* p, const int N) {
     cout << endl;
 }
 
-void SortStudents_B(Student_B* p, const int N, int sortOption) {
+void PrintIndexSorted_B(Student_B* p, int* I, const int N) {
+    cout << "\n===========================================================================================================================" << endl;
+    cout << "| #   | Surname         | Course | Specialty                | Physics | Math | Programming | Numerical Methods | Pedagogy |" << endl;
+    cout << "---------------------------------------------------------------------------------------------------------------------------" << endl;
+    for (int i = 0; i < N; i++) {
+        cout << "| " << setw(3) << left << i + 1 << " ";
+        cout << "| " << setw(15) << left << p[I[i]].surname << " | "
+            << setw(6) << left << p[I[i]].course << " | "
+            << setw(24) << left << specialtyStr[p[I[i]].specialty] << " | "
+            << setw(7) << left << p[I[i]].physics_grade << " | "
+            << setw(4) << left << p[I[i]].math_grade << " | ";
+
+        switch (p[I[i]].specialty) {
+        case COMPUTER_SCIENCE:
+            cout << setw(11) << left << p[I[i]].programming_grade << " | ";
+            cout << setw(17) << left << " " << " | ";
+            cout << setw(8) << left << " " << " | ";
+            break;
+        case INFORMATICS:
+            cout << setw(11) << left << " " << " | ";
+            cout << setw(17) << left << p[I[i]].numerical_methods_grade << " | ";
+            cout << setw(8) << left << " " << " | ";
+            break;
+        default:
+            cout << setw(11) << left << " " << " | ";
+            cout << setw(17) << left << " " << " | ";
+            cout << setw(8) << left << p[I[i]].pedagogy_grade << " | ";
+            break;
+        }
+
+        cout << endl;
+    }
+    cout << "===========================================================================================================================" << endl;
+    cout << endl;
+}
+
+void SortStudents_B(Student_B* p, const int N) {
     for (int i = 0; i < N - 1; i++) {
         for (int j = 0; j < N - i - 1; j++) {
-            bool swapCondition = false;
-
-            if (sortOption == 1) {
-                if (p[j].physics_grade < p[j + 1].physics_grade) {
-                    swapCondition = true;
-                }
-                else if (p[j].physics_grade == p[j + 1].physics_grade) {
-                    if (p[j].course > p[j + 1].course) {
-                        swapCondition = true;
-                    }
-                    else if (p[j].course == p[j + 1].course && p[j].surname < p[j + 1].surname) {
-                        swapCondition = true;
-                    }
-                }
-            }
-            else if (sortOption == 2) {
-                if (p[j].course > p[j + 1].course) {
-                    swapCondition = true;
-                }
-                else if (p[j].course == p[j + 1].course) {
-                    if (p[j].physics_grade < p[j + 1].physics_grade) {
-                        swapCondition = true;
-                    }
-                    else if (p[j].physics_grade == p[j + 1].physics_grade && p[j].surname < p[j + 1].surname) {
-                        swapCondition = true;
-                    }
-                }
-            }
-            else if (sortOption == 3) {
-                if (p[j].surname < p[j + 1].surname) {
-                    swapCondition = true;
-                }
-                else if (p[j].surname == p[j + 1].surname) {
-                    if (p[j].course > p[j + 1].course) {
-                        swapCondition = true;
-                    }
-                    else if (p[j].course == p[j + 1].course && p[j].physics_grade < p[j + 1].physics_grade) {
-                        swapCondition = true;
-                    }
-                }
-            }
-
-            if (swapCondition) {
+            if (p[j].physics_grade < p[j + 1].physics_grade ||
+                (p[j].physics_grade == p[j + 1].physics_grade && p[j].course > p[j + 1].course) ||
+                (p[j].physics_grade == p[j + 1].physics_grade && p[j].course == p[j + 1].course && p[j].surname < p[j + 1].surname)) {
                 swap(p[j], p[j + 1]);
             }
         }
@@ -206,129 +217,35 @@ int* IndexSort_B(Student_B* p, const int N) {
         I[i] = i;
     }
 
-    int i, j, value;
-    for (i = 1; i < N; i++) {
-        value = I[i];
-        for (j = i - 1; j >= 0 &&
-            (p[I[j]].physics_grade < p[value].physics_grade ||
-                (p[I[j]].physics_grade == p[value].physics_grade && p[I[j]].course > p[value].course) ||
-                (p[I[j]].physics_grade == p[value].physics_grade && p[I[j]].course == p[value].course && p[I[j]].surname > p[value].surname)); j--) {
+    for (int i = 1; i < N; i++) {
+        int value = I[i];
+        int j = i - 1;
+        while (j >= 0 && (p[I[j]].physics_grade < p[value].physics_grade ||
+            (p[I[j]].physics_grade == p[value].physics_grade && p[I[j]].course > p[value].course) ||
+            (p[I[j]].physics_grade == p[value].physics_grade && p[I[j]].course == p[value].course && p[I[j]].surname > p[value].surname))) {
             I[j + 1] = I[j];
+            j--;
         }
         I[j + 1] = value;
     }
     return I;
 }
 
-void PrintIndexSorted_B(Student_B* p, int* I, const int N) {
-    cout << endl;
-    cout << "===========================================================================================================================" << endl;
-    cout << "| #   | Surname         | Course | Specialty                | Physics | Math | Programming | Numerical Methods | Pedagogy |" << endl;
-    cout << "---------------------------------------------------------------------------------------------------------------------------" << endl;
-    for (int i = 0; i < N; i++) {
-
-        int idx = I[i];
-
-        cout << "| " << setw(3) << left << i + 1 << " ";
-        cout << "| " << setw(15) << left << p[idx].surname << " | "
-            << setw(6) << left << p[idx].course << " | "
-            << setw(24) << left << specialtyStr[p[idx].specialty] << " | "
-            << setw(7) << left << p[idx].physics_grade << " | "
-            << setw(4) << left << p[idx].math_grade << " | ";
-
-        switch (p[idx].specialty) {
-        case COMPUTER_SCIENCE:
-            cout << setw(11) << left << p[idx].programming_grade << " | ";
-            cout << setw(17) << left << " " << " | ";
-            cout << setw(8) << left << " " << " | ";
-            break;
-        case INFORMATICS:
-            cout << setw(11) << left << " " << " | ";
-            cout << setw(17) << left << p[idx].numerical_methods_grade << " | ";
-            cout << setw(8) << left << " " << " | ";
-            break;
-        default:
-            cout << setw(11) << left << " " << " | ";
-            cout << setw(17) << left << " " << " | ";
-            cout << setw(8) << left << p[idx].pedagogy_grade << " | ";
-            break;
-        }
-
-        cout << endl;
-    }
-    cout << "===========================================================================================================================" << endl;
-    cout << endl;
-}
-
-
-bool BinarySearch_B(Student_B* p, const int N, const std::string& surname, int course, int physics_grade, int sortOption) {
+bool BinarySearch_B(Student_B* p, const int N, const std::string& surname, int course, int physics_grade) {
     int left = 0, right = N - 1;
-
     while (left <= right) {
         int mid = left + (right - left) / 2;
-
-        bool match = false;
-
-        if (sortOption == 1) {
-            if (p[mid].physics_grade == physics_grade) {
-                if (p[mid].course == course && p[mid].surname == surname) {
-                    match = true;
-                }
-                else if (p[mid].course > course) {
-                    right = mid - 1;
-                }
-                else {
-                    left = mid + 1;
-                }
-            }
-            else if (p[mid].physics_grade > physics_grade) {
-                left = mid + 1;
-            }
-            else {
-                right = mid - 1;
-            }
+        if (p[mid].physics_grade == physics_grade && p[mid].course == course && p[mid].surname == surname) {
+            return true;
         }
-        else if (sortOption == 2) {
-            if (p[mid].course == course) {
-                if (p[mid].physics_grade == physics_grade && p[mid].surname == surname) {
-                    match = true;
-                }
-                else if (p[mid].physics_grade > physics_grade) {
-                    right = mid - 1;
-                }
-                else {
-                    left = mid + 1;
-                }
-            }
-            else if (p[mid].course < course) {
-                left = mid + 1;
-            }
-            else {
-                right = mid - 1;
-            }
+        else if (p[mid].physics_grade > physics_grade ||
+            (p[mid].physics_grade == physics_grade && p[mid].course < course) ||
+            (p[mid].physics_grade == physics_grade && p[mid].course == course && p[mid].surname < surname)) {
+            right = mid - 1;
         }
-        else if (sortOption == 3) {
-            if (p[mid].surname == surname) {
-                if (p[mid].course == course && p[mid].physics_grade == physics_grade) {
-                    match = true;
-                }
-                else if (p[mid].course < course) {
-                    left = mid + 1;
-                }
-                else {
-                    right = mid - 1;
-                }
-            }
-            else if (p[mid].surname > surname) {
-                left = mid + 1;
-            }
-            else {
-                right = mid - 1;
-            }
+        else {
+            left = mid + 1;
         }
-
-        if (match) return true;
     }
-
     return false;
 }

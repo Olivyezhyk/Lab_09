@@ -20,30 +20,12 @@ namespace UnitTest4
 			};
 			int N = 4;
 
-			SortStudents_B(students, N, 1);
+			SortStudents_B(students, N);
 
 			Assert::AreEqual(students[0].physics_grade, 5);
 			Assert::AreEqual(students[1].physics_grade, 5);
 			Assert::AreEqual(students[2].physics_grade, 4);
 			Assert::AreEqual(students[3].physics_grade, 3);
-		}
-
-		TEST_METHOD(TestSortByCourse)
-		{
-			Student_B students[] = {
-				{ "Smith", 1, COMPUTER_SCIENCE, 3, 4, 5 },
-				{ "Johnson", 2, INFORMATICS, 5, 3, 5 },
-				{ "Williams", 3, MATH_ECONOMICS, 4, 4, 5 },
-				{ "Jones", 4, PHYSICS_INFORMATICS, 5, 5, 5 }
-			};
-			int N = 4;
-
-			SortStudents_B(students, N, 2);
-
-			Assert::AreEqual(students[0].course, 1);
-			Assert::AreEqual(students[1].course, 2);
-			Assert::AreEqual(students[2].course, 3);
-			Assert::AreEqual(students[3].course, 4);
 		}
 
 		TEST_METHOD(TestBinarySearch)

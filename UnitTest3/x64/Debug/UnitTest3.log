@@ -1,8 +1,2 @@
 ﻿  UnitTest3.cpp
-C:\Users\olegs\Desktop\University\github\Lab_09\UnitTest3\UnitTest3.cpp(59,17): error C2660: 'BinarySearch_A': function does not take 5 arguments
-  (compiling source file '/UnitTest3.cpp')
-      C:\Users\olegs\Desktop\University\github\Lab_09\Lab_09_02_A\Lab_09_02_A.cpp(197,6):
-      see declaration of 'BinarySearch_A'
-      C:\Users\olegs\Desktop\University\github\Lab_09\UnitTest3\UnitTest3.cpp(59,17):
-      while trying to match the argument list '(Student_A [4], int, const char [6], int, int)'
-  
+  UnitTest3.vcxproj -> C:\Users\olegs\Desktop\University\github\Lab_09\x64\Debug\UnitTest3.dll

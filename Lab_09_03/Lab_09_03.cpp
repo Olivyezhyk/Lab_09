@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <string>
@@ -141,7 +141,7 @@ Note* searchByPhone(Note notes[], int N, const string& phone) {
 }
 
 void saveToFile(Note notes[], int N, const string& filename) {
-    ofstream fout(filename);
+    ofstream fout(filename, ios::binary);
     if (!fout) {
         cerr << "Error opening file for writing!" << endl;
         return;
@@ -155,7 +155,7 @@ void saveToFile(Note notes[], int N, const string& filename) {
 }
 
 void loadFromFile(Note notes[], int& N, const string& filename) {
-    ifstream fin(filename);
+    ifstream fin(filename, ios::binary);
     if (!fin) {
         cerr << "Failed to open the file!" << endl;
         return;
